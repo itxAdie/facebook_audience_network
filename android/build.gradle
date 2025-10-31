@@ -1,43 +1,70 @@
-group 'com.dsi.facebook_audience_network'
-version '1.0-SNAPSHOT'
+group = "com.dsi.facebook_audience_network"
+version = "1.0-SNAPSHOT"
 
 buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.0'
-    }
-}
-
-rootProject.allprojects {
+    ext.kotlin_version = "2.1.0"
     repositories {
         google()
         mavenCentral()
-        jcenter()
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.9.1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 }
 
-apply plugin: 'com.android.library'
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
 
 android {
-    namespace "com.dsi.facebook_audience_network"
-    compileSdkVersion 35
+    namespace = "com.dsi.facebook_audience_network"
+
+    compileSdk = 36
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
+    }
 
     defaultConfig {
-        minSdkVersion 21
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        minSdk = 24
     }
-    lintOptions {
-        disable 'InvalidPackage'
-    }
-}
 
-dependencies {
-    implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0'
-    implementation 'com.facebook.android:audience-network-sdk:6.+'
-    implementation 'androidx.annotation:annotation:1.1.0'
-    compileOnly files('tempLibs/flutter.jar')
+    dependencies {
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+        testImplementation("org.mockito:mockito-core:5.0.0")
+        implementation 'androidx.lifecycle:lifecycle-runtime:2.2.0'
+        implementation 'com.facebook.android:audience-network-sdk:6.+'
+        implementation 'androidx.annotation:annotation:1.1.0'
+        compileOnly files('tempLibs/flutter.jar')
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+
+            testLogging {
+               events "passed", "skipped", "failed", "standardOut", "standardError"
+               outputs.upToDateWhen {false}
+               showStandardStreams = true
+            }
+        }
+    }
 }
