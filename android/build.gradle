@@ -53,7 +53,7 @@ android {
         implementation 'androidx.lifecycle:lifecycle-runtime:2.9.2'
         implementation 'com.facebook.android:audience-network-sdk:6.+'
         implementation 'androidx.annotation:annotation:1.9.1'
-        compileOnly files('tempLibs/flutter.jar')
+        // compileOnly files('tempLibs/flutter.jar')
     }
 
     testOptions {
