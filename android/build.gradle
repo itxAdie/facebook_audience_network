@@ -3,21 +3,15 @@ version = "1.0-SNAPSHOT"
 
 buildscript {
     ext.kotlin_version = "2.1.0"
+
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.9.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
+        classpath "com.android.tools.build:gradle:8.9.0"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -25,46 +19,58 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-    namespace = "com.dsi.facebook_audience_network"
+    namespace "com.dsi.facebook_audience_network"
+    compileSdk 36
 
-    compileSdk = 36
+    defaultConfig {
+        minSdk 24
+    }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
+        jvmTarget = "11"
     }
 
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
         test.java.srcDirs += "src/test/kotlin"
     }
+}
 
-    defaultConfig {
-        minSdk = 24
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation "org.jetbrains.kotlin:kotlin-test"
+    testImplementation "org.mockito:mockito-core:5.0.0"
+    implementation "androidx.lifecycle:lifecycle-runtime:2.2.0"
+    implementation "com.facebook.android:audience-network-sdk:6.+"
+    implementation "androidx.annotation:annotation:1.1.0"
+
+    // ✅ Correct flutter.jar reference — no tempLibs folder
+    def flutterRoot = System.getenv("FLUTTER_ROOT")
+    if (flutterRoot != null) {
+        compileOnly files("$flutterRoot/bin/cache/artifacts/engine/android/flutter.jar")
+    } else {
+        // fallback — relative path if FLUTTER_ROOT not set
+        compileOnly files("${rootProject.projectDir}/../../flutter/bin/cache/artifacts/engine/android/flutter.jar")
     }
+}
 
-    dependencies {
-        testImplementation("org.jetbrains.kotlin:kotlin-test")
-        testImplementation("org.mockito:mockito-core:5.0.0")
-        implementation 'androidx.lifecycle:lifecycle-runtime:2.9.2'
-        implementation 'com.facebook.android:audience-network-sdk:6.+'
-        implementation 'androidx.annotation:annotation:1.9.1'
-        // compileOnly files('tempLibs/flutter.jar')
-    }
+testOptions {
+    unitTests.all {
+        useJUnitPlatform()
 
-    testOptions {
-        unitTests.all {
-            useJUnitPlatform()
-
-            testLogging {
-               events "passed", "skipped", "failed", "standardOut", "standardError"
-               outputs.upToDateWhen {false}
-               showStandardStreams = true
-            }
+        testLogging {
+            events "passed", "skipped", "failed", "standardOut", "standardError"
+            outputs.upToDateWhen { false }
+            showStandardStreams = true
         }
     }
 }
